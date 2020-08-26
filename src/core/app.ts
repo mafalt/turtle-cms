@@ -1,4 +1,4 @@
-import e from "express";
+import e, { Request, Response, NextFunction } from "express";
 import {Server as HttpServer, createServer as createHttpServer, RequestListener, IncomingMessage, ServerResponse} from 'http';
 import {Server as HttpsServer, createServer as createHttpsServer} from 'https';
 import fs from 'fs';
@@ -6,6 +6,7 @@ import {redirect} from '../helpers/http';
 import path from 'path';
 import ControllerBase from "./controllerbase";
 import MiddlewareBase from "./middlewarebase";
+import DataClientBase from "./dataclientbase";
 
 export default class App {
     private _app: e.Application;
@@ -20,6 +21,7 @@ export default class App {
     private _viewEngine: string;
     private _controllers: ControllerBase[];
     private _middlewares: MiddlewareBase[];
+    private _dataClient?: DataClientBase;
 
     constructor(appOptions: {
         httpPort: number,
@@ -27,14 +29,12 @@ export default class App {
         viewEngine?: string,
         controllers?: ControllerBase[],
         middlewares?: MiddlewareBase[],
-        dataClient?: any,
         keyFilePath?: string,
         certFilePath?: string,
         publicFolder?: string,
-        viewsFolder?: string
+        viewsFolder?: string,
+        dataClient?: DataClientBase
     }) {
-        this._app = e();
-
         this._httpPort = appOptions.httpPort;
         this._httpsPort = appOptions.httpsPort;
         this._keyFilePath = appOptions.keyFilePath;
@@ -44,6 +44,9 @@ export default class App {
         this._viewEngine = appOptions.viewEngine ? appOptions.viewEngine : 'ejs';
         this._controllers = appOptions.controllers;
         this._middlewares = appOptions.middlewares;
+        this._dataClient = appOptions.dataClient;
+
+        this._app = e();
 
         this.intitializeViews();
         this.intitializeViews();
@@ -121,6 +124,16 @@ export default class App {
         }
     }
 
+    get dataClient(): DataClientBase {
+        return this._dataClient;
+    }
+
+    set dataClient(value: DataClientBase) {
+        if (value && value !== this._dataClient) {
+            this._dataClient = value;
+        }
+    }
+
     protected initializeControllers() {
         this._controllers.forEach((c) => {
             this._app.use(c.baseUrl, c.router);
@@ -130,7 +143,15 @@ export default class App {
     protected initializeMiddlewares() {
         this._middlewares.forEach((m) => {
             this._app.use(m.handle);
-        })
+        });
+
+        // Add database client to response object
+        this._app.use(this.addDatabaseClientToResponseMiddleware);
+    }
+
+    private addDatabaseClientToResponseMiddleware(req: Request, res: Response, next: NextFunction) {
+        res.locals.dbClient = this._dataClient;
+        next();
     }
 
     protected intitializeViews() {
