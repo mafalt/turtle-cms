@@ -4,8 +4,10 @@ import {Server as HttpsServer, createServer as createHttpsServer} from 'https';
 import fs from 'fs';
 import {redirect} from '../helpers/http';
 import path from 'path';
+import ControllerBase from "./controllerbase";
+import MiddlewareBase from "./middlewarebase";
 
-export default abstract class AppBase {
+export default class App {
     private _app: e.Application;
     private _httpPort: number;
     private _httpsPort?: number;
@@ -16,13 +18,15 @@ export default abstract class AppBase {
     private _publicFolder: string;
     private _viewsFolder: string;
     private _viewEngine: string;
+    private _controllers: ControllerBase[];
+    private _middlewares: MiddlewareBase[];
 
     constructor(appOptions: {
         httpPort: number,
         httpsPort?: number,
         viewEngine?: string,
-        controllers?: any,
-        middlewares?: any,
+        controllers?: ControllerBase[],
+        middlewares?: MiddlewareBase[],
         dataClient?: any,
         keyFilePath?: string,
         certFilePath?: string,
@@ -38,6 +42,8 @@ export default abstract class AppBase {
         this._publicFolder = appOptions.publicFolder ? appOptions.publicFolder : 'public';
         this._viewsFolder = appOptions.viewsFolder ? appOptions.viewsFolder : 'views';
         this._viewEngine = appOptions.viewEngine ? appOptions.viewEngine : 'ejs';
+        this._controllers = appOptions.controllers;
+        this._middlewares = appOptions.middlewares;
 
         this.intitializeViews();
         this.intitializeViews();
@@ -115,8 +121,17 @@ export default abstract class AppBase {
         }
     }
 
-    protected abstract initializeControllers(): void;
-    protected abstract initializeMiddlewares(): void;
+    protected initializeControllers() {
+        this._controllers.forEach((c) => {
+            this._app.use(c.baseUrl, c.router);
+        });
+    }
+
+    protected initializeMiddlewares() {
+        this._middlewares.forEach((m) => {
+            this._app.use(m.handle);
+        })
+    }
 
     protected intitializeViews() {
         this._app.set('views', path.join(__dirname, this._viewsFolder));
