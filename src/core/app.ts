@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from "express";
+import e from "express";
 import {Server as HttpServer, createServer as createHttpServer, RequestListener, IncomingMessage, ServerResponse} from 'http';
 import {Server as HttpsServer, createServer as createHttpsServer} from 'https';
 import fs from 'fs';
@@ -28,7 +28,7 @@ export default class App {
         httpsPort?: number,
         viewEngine?: string,
         controllers?: ControllerBase[],
-        middlewares?: MiddlewareBase[],
+        middlewares?: any,
         keyFilePath?: string,
         certFilePath?: string,
         publicFolder?: string,
@@ -135,23 +135,33 @@ export default class App {
     }
 
     protected initializeControllers() {
-        this._controllers.forEach((c) => {
-            this._app.use(c.baseUrl, c.router);
-        });
+        if (this._controllers) {
+            this._controllers.forEach((c) => {
+                this._app.use(c.baseUrl, c.router);
+            });
+        }
     }
 
     protected initializeMiddlewares() {
-        this._middlewares.forEach((m) => {
-            this._app.use(m.handle);
-        });
+        if (this._middlewares) {
+            this._middlewares.forEach((m) => {
+                if (m instanceof MiddlewareBase) {
+                    this._app.use(m.handle);
+                } else {
+                    this._app.use(m);
+                }
+            });
+        }
 
         // Add database client to response object
-        this._app.use(this.addDatabaseClientToResponseMiddleware);
+        this._app.use(this.addDatabaseClientToResponseMiddleware(this._dataClient));
     }
 
-    private addDatabaseClientToResponseMiddleware(req: Request, res: Response, next: NextFunction) {
-        res.locals.dbClient = this._dataClient;
-        next();
+    private addDatabaseClientToResponseMiddleware(dataClient: DataClientBase): e.Handler {
+        return  (req: e.Request, res: e.Response, next: e.NextFunction) => {
+            res.locals.dbClient = dataClient;
+            next();
+        };
     }
 
     protected intitializeViews() {
@@ -187,9 +197,15 @@ export default class App {
 
     public start() {
         this.createServers();
-        this._httpServer.listen(this._httpPort);
+        this._httpServer.listen(this._httpPort, () => {
+            // tslint:disable-next-line:no-console
+            console.log(`HTTP server is listening on http://localhost:${this._httpPort}/`);
+        });
         if (this._httpsServer) {
-            this._httpsServer.listen(this._httpsPort);
+            this._httpsServer.listen(this._httpsPort, () => {
+                // tslint:disable-next-line:no-console
+                console.log(`HTTPS server is listening on https://localhost:${this._httpsPort}/`);
+            });
         }
     }
 }
