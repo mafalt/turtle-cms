@@ -88,7 +88,7 @@ export default class App {
     get publicFolder(): string {
         return this._publicFolder;
     }
-    
+
     set publicFolder(value: string) {
         if (value && value !== this._publicFolder) {
             this._publicFolder = value;
