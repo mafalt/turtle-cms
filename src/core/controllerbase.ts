@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response, NextFunction, Handler } from "express";
 
 export default abstract class ControllerBase {
     private _router: Router;
@@ -12,6 +12,17 @@ export default abstract class ControllerBase {
     }
 
     protected abstract initializeRoutes(): void;
+
+    protected isAuthenticated(redirectUrl: string): Handler {
+        return (req: Request, res: Response, next: NextFunction) => {
+            if (req.session.user) {
+                next();
+            } else {
+                res.redirect(redirectUrl);
+                res.end();
+            }
+        }
+    }
 
     get router(): Router {
         return this._router;

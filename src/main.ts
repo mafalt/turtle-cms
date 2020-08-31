@@ -8,12 +8,16 @@ import DataClientBase from './core/dataclientbase';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import expressSession from 'express-session';
+import { AdminController } from './controllers/admin.controller';
 
 dotenv.config();
 
 const logFormat = process.env.LOG_FORMAT ? process.env.LOG_FORMAT : 'dev';
 
-var controllers: ControllerBase[] = [];
+var controllers: ControllerBase[] = [
+    new AdminController('/admin')
+];
+
 var middlewares = [
     morgan('dev'),
     bodyParser.json(),

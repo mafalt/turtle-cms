@@ -1,0 +1,23 @@
+body {
+    background-color: azure;
+}
+
+.card {
+    margin-top: 20px;
+}
+
+.navbar-admin a {
+    color: black;
+}
+
+.navbar-admin a:visited {
+    color: black
+}
+
+.navbar-admin a:hover {
+    color: white;
+}
+
+.bg-admin {
+    background-color: cornflowerblue;
+}

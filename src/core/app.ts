@@ -50,6 +50,7 @@ export default class App {
 
         this.intitializeViews();
         this.intitializeViews();
+        this.initializeStatic();
         this.initializeMiddlewares();
         this.initializeControllers();
     }
@@ -155,6 +156,9 @@ export default class App {
 
         // Add database client to response object
         this._app.use(this.addDatabaseClientToResponseMiddleware(this._dataClient));
+
+        // Add user object to session
+        this._app.use(this.addUserToSessionMiddleware);
     }
 
     private addDatabaseClientToResponseMiddleware(dataClient: DataClientBase): e.Handler {
@@ -162,6 +166,14 @@ export default class App {
             res.locals.dbClient = dataClient;
             next();
         };
+    }
+
+    private addUserToSessionMiddleware(req: e.Request, res: e.Response, next: e.NextFunction) {
+        if (!req.session.user) {
+            req.session.user = null;
+        }
+
+        next();
     }
 
     protected intitializeViews() {
