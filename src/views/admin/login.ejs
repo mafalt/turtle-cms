@@ -8,7 +8,7 @@
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title">Login</h3>
-                    <form id="loginForm" method="POST" novalidate>
+                    <form id="loginForm" method="POST" class="require-validation" novalidate>
                         <% if (msg) { %>
                             <div class="alert alert-danger" role="alert"><%= msg %></div>
                         <% } %>
@@ -32,23 +32,5 @@
                 </div>
             </div>
         </div>
-
-        <script>
-            (function() {
-                'use strict';
-
-                window.addEventListener('load', function() {
-                    var form = document.getElementById('loginForm');
-                    form.addEventListener('submit', function(event) {
-                        if (form.checkValidity() === false) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-
-                        form.classList.add('was-validated');
-                    });
-                }, false);
-            })();
-        </script>
     </body>
 </html>
