@@ -1,5 +1,6 @@
 import ControllerBase from "../core/controllerbase";
 import { Request, Response } from "express";
+import { ValidatedUser } from "../models/usermodels";
 
 export class AdminController extends ControllerBase {
 
@@ -46,8 +47,10 @@ export class AdminController extends ControllerBase {
     private postLogin(req: Request, res: Response) {
         let {username, password} = req.body;
         if (username === 'admin' && password === 'admin') {
-            req.session.user = {username: 'admin', fullName: 'Administrator', roles: ['ADMIN']}
-            res.locals.authenticated = req.session.user && (req.session.user.roles.includes('ADMIN'));
+            // req.session.user = {username: 'admin', fullName: 'Administrator', roles: ['ADMIN']}
+            // res.locals.authenticated = req.session.user && (req.session.user.roles.includes('ADMIN'));
+            req.session.user = new ValidatedUser(1, 'admin', 'Administrator', true, false, null);
+            res.locals.authenticated = req.session.user && req.session.user.isAdmin;
             res.redirect(`${AdminController.baseUrl}/dashboard`);
         } else {
             res.render('admin/login', {msg: 'Invalid login name or password', user: null});
