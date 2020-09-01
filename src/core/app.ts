@@ -6,7 +6,7 @@ import {redirect} from '../helpers/http';
 import path from 'path';
 import ControllerBase from "./controllerbase";
 import MiddlewareBase from "./middlewarebase";
-import DataClientBase from "./dataclientbase";
+import DataClientBase from "./data/dataclientbase";
 
 export default class App {
     private _app: e.Application;

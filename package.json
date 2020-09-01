@@ -42,7 +42,8 @@
     "ejs": "^3.1.5",
     "bootstrap": "4.5.2",
     "jquery": "3.5.1",
-    "popper.js": "1.16.1"
+    "popper.js": "1.16.1",
+    "mssql": "6.2.1"
   },
   "devDependencies": {
     "typescript": "^3.4.3",
@@ -59,6 +60,7 @@
     "@types/cookie-parser": "^1.4.1",
     "@types/dotenv": "^8.2.0",
     "@types/express-session": "^1.15.8",
-    "@types/shelljs": "^0.7.9"
+    "@types/shelljs": "^0.7.9",
+    "@types/mssql": "4.0.7"
   }
 }
