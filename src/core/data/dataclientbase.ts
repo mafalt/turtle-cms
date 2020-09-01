@@ -1,7 +1,7 @@
 import { Query } from "./query";
 
 export default abstract class DataClientBase {
-    protected abstract queryImpl(query: any): Promise<void | any>;
+    protected abstract queryImpl(query: Query): Promise<void | any>;
 
     public async query(query: Query): Promise<void | any> {
         try {
