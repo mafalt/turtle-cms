@@ -9,8 +9,11 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import expressSession from 'express-session';
 import { AdminController } from './controllers/admin.controller';
+import { Config } from './core/config';
 
 dotenv.config();
+
+const config = new Config();
 
 const logFormat = process.env.LOG_FORMAT ? process.env.LOG_FORMAT : 'dev';
 

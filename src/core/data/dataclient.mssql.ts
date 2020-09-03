@@ -23,9 +23,9 @@ export class MSSQLDataClient extends DataClientBase {
     protected async queryImpl(query: Query): Promise<any> {
         try {
             await this.connect();
-            
+
             if (query.parameters && query.parameters.length > 0) {
-                var params: {[key: string]: any} = {};
+                const params: {[key: string]: any} = {};
                 const ps = new mssql.PreparedStatement(this.client);
                 query.parameters.forEach(p => {
                     if (p.isOutput) {
@@ -42,11 +42,7 @@ export class MSSQLDataClient extends DataClientBase {
                 } catch (err) {
                     throw err;
                 } finally {
-                    try {
-                        await ps.unprepare();
-                    } catch (err) {
-                        throw err;
-                    }
+                    await ps.unprepare();
                 }
             } else {
                 const request = new mssql.Request(this.client);
